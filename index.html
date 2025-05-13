@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mood Motivator</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans p-6">
+  <div class="max-w-lg mx-auto text-center">
+    <h1 class="text-3xl font-semibold mb-6 text-indigo-600">Mood-Based Motivator</h1>
+    
+    <!-- Mood Selector -->
+    <div class="mb-8">
+      <h2 class="text-2xl mb-4">कैसा महसूस कर रहे हो?</h2>
+      <div class="grid grid-cols-3 gap-4">
+        <button class="mood-btn text-3xl p-4 rounded-full bg-yellow-500 text-white hover:bg-yellow-400" data-mood="happy">😊</button>
+        <button class="mood-btn text-3xl p-4 rounded-full bg-blue-500 text-white hover:bg-blue-400" data-mood="sad">😢</button>
+        <button class="mood-btn text-3xl p-4 rounded-full bg-red-500 text-white hover:bg-red-400" data-mood="angry">😡</button>
+        <button class="mood-btn text-3xl p-4 rounded-full bg-gray-500 text-white hover:bg-gray-400" data-mood="bored">😐</button>
+        <button class="mood-btn text-3xl p-4 rounded-full bg-green-500 text-white hover:bg-green-400" data-mood="stressed">😣</button>
+      </div>
+    </div>
+    
+    <!-- Motivation Result -->
+    <div id="result" class="mb-8"></div>
+    
+    <!-- Pomodoro Timer -->
+    <div class="timer mt-6">
+      <h2 class="text-xl font-semibold mb-4">Pomodoro Timer</h2>
+      <p id="timer-display" class="text-3xl font-semibold mb-4">25:00</p>
+      <div class="flex justify-center space-x-4">
+        <button onclick="startTimer()" class="bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-400">Start</button>
+        <button onclick="resetTimer()" class="bg-gray-500 text-white p-3 rounded-lg hover:bg-gray-400">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const moodData = {
+      happy: {
+        message: "Awesome! Keep it going! 🚀",
+        video: "https://www.youtube.com/embed/ZbZSe6N_BXs",
+        blockList: ["netflix.com", "instagram.com"]
+      },
+      sad: {
+        message: "Cheer up! Here's something inspiring 💪",
+        video: "https://www.youtube.com/embed/wnHW6o8WMas",
+        blockList: ["twitter.com", "youtube.com"]
+      },
+      angry: {
+        message: "Take a breath. You're in control. ✨",
+        video: "https://www.youtube.com/embed/2Lz0VOltZKA",
+        blockList: ["reddit.com", "facebook.com"]
+      },
+      bored: {
+        message: "Let's spice things up with a fun challenge! 🎯",
+        video: "https://www.youtube.com/embed/fq4N0hgOWzU",
+        blockList: ["tiktok.com", "9gag.com"]
+      },
+      stressed: {
+        message: "Relax. You've got this. 🧘‍♂️",
+        video: "https://www.youtube.com/embed/MIr3RsUWrdo",
+        blockList: ["news.com", "linkedin.com"]
+      }
+    };
+
+    document.querySelectorAll('.mood-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mood = btn.dataset.mood;
+        showMotivation(mood);
+        saveMoodLog(mood);
+      });
+    });
+
+    function showMotivation(mood) {
+      const moodContent = moodData[mood];
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = `
+        <h3 class="text-2xl font-bold text-indigo-600">${moodContent.message}</h3>
+        <iframe class="my-4" width="320" height="180" src="${moodContent.video}" frameborder="0" allowfullscreen></iframe>
+        <p><strong class="font-semibold">Avoid:</strong> ${moodContent.blockList.join(', ')}</p>
+      `;
+    }
+
+    // Pomodoro Timer Logic
+    let timer;
+    let timeLeft = 1500; // 25 minutes
+
+    function startTimer() {
+      clearInterval(timer);
+      timer = setInterval(() => {
+        if (timeLeft > 0) {
+          timeLeft--;
+          updateDisplay();
+        } else {
+          clearInterval(timer);
+          alert("Time's up! Take a break.");
+        }
+      }, 1000);
+    }
+
+    function resetTimer() {
+      clearInterval(timer);
+      timeLeft = 1500;
+      updateDisplay();
+    }
+
+    function updateDisplay() {
+      const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+      const seconds = (timeLeft % 60).toString().padStart(2, '0');
+      document.getElementById('timer-display').textContent = `${minutes}:${seconds}`;
+    }
+
+    // Mood Logger with localStorage
+    function saveMoodLog(mood) {
+      const today = new Date().toLocaleDateString();
+      const log = JSON.parse(localStorage.getItem("moodLog")) || {};
+      log[today] = mood;
+      localStorage.setItem("moodLog", JSON.stringify(log));
+    }
+  </script>
+</body>
+</html>
